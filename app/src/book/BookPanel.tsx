@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../store/store'
 import { BookSlot as BookSlotType, PageLayout } from '../store/types'
-import { BOOK_SIZES, PAGE_LAYOUTS, SPREAD_LAYOUTS, getSize } from '../templates'
+import { BOOK_SIZES, PAGE_LAYOUTS, ZINE_LAYOUTS, SPREAD_LAYOUTS, getSize } from '../templates'
 import { buildExportJSON, downloadBookJSON } from '../lib/bookExport'
 import { exportBookToPDF, PDFProgress } from '../lib/pdfExport'
 
@@ -87,8 +87,8 @@ function SlotRow({ slot, onUpdate, onDelete }: { slot: BookSlotType; onUpdate: (
 }
 
 export function BookPanel() {
-  const { sizeId, customWidth, customHeight, defaultLayoutId, numPages, currentSpreadIndex, pageLayouts, customSlots, spreadLayouts, customSpreadSlots, assignments } = useStore((s) => s.book)
-  const { setBookSizeId, setCustomSize, setBookNumPages, setPageLayout, setCustomSlots, setSpreadLayout, setCustomSpreadSlots, clearAllAssignments } = useStore()
+  const { sizeId, customWidth, customHeight, bookStyle, defaultLayoutId, numPages, currentSpreadIndex, pageLayouts, customSlots, spreadLayouts, customSpreadSlots, assignments } = useStore((s) => s.book)
+  const { setBookSizeId, setCustomSize, setBookStyle, setBookNumPages, setPageLayout, setCustomSlots, setSpreadLayout, setCustomSpreadSlots, clearAllAssignments } = useStore()
 
   const [layoutMode, setLayoutMode] = useState<'page' | 'spread'>('page')
   const [target, setTarget] = useState<'left' | 'right'>('right')
@@ -161,6 +161,32 @@ export function BookPanel() {
       className="flex flex-col h-full z-20"
       style={{ width: 272, minWidth: 272, borderLeft: '1px solid rgba(255,255,255,0.05)', background: 'rgba(10,9,8,0.98)' }}
     >
+      {/* Book / Zine mode */}
+      <div className="px-3 pt-3 pb-2 border-b border-white/[0.04]">
+        <div className="flex gap-1">
+          {(['book', 'zine'] as const).map((style) => (
+            <button
+              key={style}
+              onClick={() => setBookStyle(style)}
+              className={`flex-1 py-2 text-[8px] uppercase tracking-[0.25em] rounded-sm border transition-all font-bold ${
+                bookStyle === style
+                  ? style === 'zine'
+                    ? 'bg-purple-500/15 text-purple-300 border-purple-500/35'
+                    : 'bg-orange-500/15 text-orange-300 border-orange-500/30'
+                  : 'text-white/20 hover:text-white/40 border-white/5'
+              }`}
+            >
+              {style === 'book' ? 'Book' : 'Zine'}
+            </button>
+          ))}
+        </div>
+        {bookStyle === 'zine' && (
+          <p className="mt-2 text-[7px] text-purple-300/40 leading-relaxed">
+            Half-letter, A5, quarter-fold. Asymmetric layouts, body copy, collage.
+          </p>
+        )}
+      </div>
+
       {/* Book Size */}
       <div className="px-4 pt-4 pb-3 border-b border-white/[0.05]">
         <label className="text-[8px] text-white/25 uppercase tracking-[0.3em] block mb-2 font-bold">Book Size</label>
@@ -169,6 +195,11 @@ export function BookPanel() {
           onChange={(e) => setBookSizeId(e.target.value)}
           className="w-full text-[10px] bg-black/40 border border-white/[0.08] text-gray-300 rounded-sm px-2 py-2 focus:outline-none focus:border-orange-500/40"
         >
+          {bookStyle === 'zine' && (
+            <optgroup label="Zine">
+              {BOOK_SIZES.filter((s) => s.category === 'zine').map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </optgroup>
+          )}
           <optgroup label="Square">
             {BOOK_SIZES.filter((s) => s.category === 'square').map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </optgroup>
@@ -303,20 +334,24 @@ export function BookPanel() {
             <div className="flex-1 overflow-y-auto p-3">
               <div className="text-[8px] text-white/20 uppercase tracking-[0.3em] mb-3 font-bold">Layout</div>
               <div className="grid grid-cols-3 gap-2">
-                {PAGE_LAYOUTS.map((layout) => {
+                {(bookStyle === 'zine' ? ZINE_LAYOUTS : PAGE_LAYOUTS).map((layout) => {
                   const active = activePageLayoutId === layout.id
+                  const accentActive = bookStyle === 'zine'
+                    ? 'border-purple-500/40 bg-purple-500/8'
+                    : 'border-orange-500/40 bg-orange-500/8'
+                  const accentText = bookStyle === 'zine' ? 'text-purple-300/80' : 'text-orange-300/80'
                   return (
                     <button
                       key={layout.id}
                       onClick={() => applyPageLayout(layout.id)}
                       className={`flex flex-col items-center gap-1.5 p-1.5 rounded-sm border transition-all ${
-                        active ? 'border-orange-500/40 bg-orange-500/8' : 'border-white/[0.05] hover:border-white/15 bg-white/[0.02]'
+                        active ? accentActive : 'border-white/[0.05] hover:border-white/15 bg-white/[0.02]'
                       }`}
                     >
                       <div className="w-full aspect-square">
                         <LayoutThumbnail layout={layout} active={active} />
                       </div>
-                      <span className={`text-[7px] uppercase tracking-wide text-center leading-tight ${active ? 'text-orange-300/80' : 'text-white/20'}`}>
+                      <span className={`text-[7px] uppercase tracking-wide text-center leading-tight ${active ? accentText : 'text-white/20'}`}>
                         {layout.name}
                       </span>
                     </button>

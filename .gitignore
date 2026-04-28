@@ -6,7 +6,7 @@
 
 # Node
 node_modules/
-phototable-src/dist/
+app/dist/
 
 # Env / secrets
 .env

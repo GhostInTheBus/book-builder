@@ -79,7 +79,7 @@ export interface BookSize {
   width: number
   height: number
   unit: 'in'
-  category: 'square' | 'portrait' | 'landscape'
+  category: 'square' | 'portrait' | 'landscape' | 'zine'
 }
 
 export interface PageLayout {
@@ -93,6 +93,7 @@ export interface BookState {
   sizeId: string
   customWidth: number   // used when sizeId === 'custom'
   customHeight: number
+  bookStyle: 'book' | 'zine'
   defaultLayoutId: string
   numPages: number
   currentSpreadIndex: number

@@ -70,6 +70,7 @@ interface StoreActions {
   // Book Actions
   setBookSizeId: (id: string) => void
   setCustomSize: (width: number, height: number) => void
+  setBookStyle: (style: 'book' | 'zine') => void
   setDefaultLayoutId: (id: string) => void
   setBookNumPages: (num: number) => void
   setSpreadIndex: (index: number) => void
@@ -106,6 +107,7 @@ export const useStore = create<StoreState>()(
       sizeId: 'sq-10',
       customWidth: 10,
       customHeight: 10,
+      bookStyle: 'book' as const,
       defaultLayoutId: 'full-bleed',
       numPages: 20,
       currentSpreadIndex: 0,
@@ -270,6 +272,7 @@ export const useStore = create<StoreState>()(
     // Book Actions
     setBookSizeId: (id) => set((s) => ({ book: { ...s.book, sizeId: id } })),
     setCustomSize: (width, height) => set((s) => ({ book: { ...s.book, customWidth: width, customHeight: height } })),
+    setBookStyle: (style) => set((s) => ({ book: { ...s.book, bookStyle: style } })),
     setDefaultLayoutId: (id) => set((s) => ({ book: { ...s.book, defaultLayoutId: id } })),
     setBookNumPages: (num) => set((s) => ({ book: { ...s.book, numPages: num } })),
     setSpreadIndex: (index) => set((s) => ({ book: { ...s.book, currentSpreadIndex: index } })),

@@ -110,5 +110,5 @@ export async function exportLayoutAsPDF(
     hotfixes: ['px_scaling'],
   })
   pdf.addImage(imgData, 'JPEG', 0, 0, contentW, contentH)
-  pdf.save(`phototable-${new Date().toISOString().slice(0, 10)}.pdf`)
+  pdf.save(`book-builder-${new Date().toISOString().slice(0, 10)}.pdf`)
 }
