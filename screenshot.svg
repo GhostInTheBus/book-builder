@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" style="font-family: system-ui, sans-serif;">
+  <!-- App background -->
+  <rect width="960" height="560" fill="#0a0908"/>
+
+  <!-- Top bar -->
+  <rect width="960" height="36" fill="#0d0c0b"/>
+  <rect width="960" height="1" y="36" fill="rgba(255,255,255,0.04)"/>
+  <text x="16" y="23" font-size="10" font-weight="900" fill="#f97316" letter-spacing="2" text-anchor="start" font-family="monospace">BOOK BUILDER</text>
+
+  <!-- ── LEFT: Page Navigator ── -->
+  <rect x="0" y="37" width="160" height="523" fill="#0d0c0b"/>
+  <rect x="160" y="37" width="1" height="523" fill="rgba(255,255,255,0.04)"/>
+  <text x="12" y="57" font-size="8" fill="rgba(255,255,255,0.2)" letter-spacing="3" font-family="monospace">PAGES</text>
+
+  <!-- Page rows -->
+  <g opacity="0.85">
+    <!-- Cover row (active) -->
+    <rect x="8" y="64" width="144" height="22" rx="2" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.25)" stroke-width="0.5"/>
+    <circle cx="18" cy="75" r="3" fill="#f97316"/>
+    <text x="28" y="79" font-size="8" fill="rgba(249,115,22,0.9)" font-family="monospace">Cover</text>
+    <text x="120" y="79" font-size="7" fill="rgba(255,255,255,0.2)" font-family="monospace">1–2</text>
+
+    <!-- Spread rows -->
+    <rect x="8" y="90" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <circle cx="18" cy="101" r="2" fill="rgba(255,255,255,0.1)"/>
+    <text x="28" y="105" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace">Spread 2</text>
+    <text x="120" y="105" font-size="7" fill="rgba(255,255,255,0.15)" font-family="monospace">3–4</text>
+
+    <rect x="8" y="116" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <circle cx="18" cy="127" r="2" fill="rgba(255,255,255,0.1)"/>
+    <text x="28" y="131" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace">Spread 3</text>
+    <text x="120" y="131" font-size="7" fill="rgba(255,255,255,0.15)" font-family="monospace">5–6</text>
+
+    <rect x="8" y="142" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <circle cx="18" cy="153" r="2" fill="rgba(255,255,255,0.1)"/>
+    <text x="28" y="157" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace">Spread 4</text>
+    <text x="120" y="157" font-size="7" fill="rgba(255,255,255,0.15)" font-family="monospace">7–8</text>
+
+    <rect x="8" y="168" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <circle cx="18" cy="179" r="2" fill="rgba(255,255,255,0.1)"/>
+    <text x="28" y="183" font-size="8" fill="rgba(255,255,255,0.3)" font-family="monospace">Spread 5</text>
+    <text x="120" y="183" font-size="7" fill="rgba(255,255,255,0.15)" font-family="monospace">9–10</text>
+
+    <rect x="8" y="194" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <rect x="8" y="220" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <rect x="8" y="246" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <rect x="8" y="272" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+    <rect x="8" y="298" width="144" height="22" rx="2" fill="rgba(255,255,255,0.02)"/>
+  </g>
+
+  <!-- ── CENTER: Spread View ── -->
+  <!-- Left page (cover — blank / dimmed) -->
+  <rect x="200" y="80" width="240" height="300" fill="#e8e4e0" rx="1"
+        style="filter: drop-shadow(8px 8px 20px rgba(0,0,0,0.5))"/>
+  <rect x="200" y="80" width="240" height="300" fill="rgba(0,0,0,0.35)" rx="1"/>
+  <text x="320" y="238" font-size="8" fill="rgba(0,0,0,0.2)" text-anchor="middle" letter-spacing="4" font-family="monospace">BLANK</text>
+
+  <!-- Right page (full-bleed photo) -->
+  <rect x="441" y="80" width="240" height="300" fill="#fdfbf9" rx="1"
+        style="filter: drop-shadow(-8px 8px 20px rgba(0,0,0,0.5))"/>
+  <!-- Photo fill -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ba7c4"/>
+      <stop offset="60%" stop-color="#c4a882"/>
+      <stop offset="100%" stop-color="#8a7060"/>
+    </linearGradient>
+    <linearGradient id="highlight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.12)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.08)"/>
+    </linearGradient>
+    <clipPath id="rightpage">
+      <rect x="441" y="80" width="240" height="300" rx="1"/>
+    </clipPath>
+  </defs>
+  <rect x="441" y="80" width="240" height="300" fill="url(#sky)" clip-path="url(#rightpage)"/>
+  <!-- Simulated landscape photo content -->
+  <ellipse cx="530" cy="240" rx="60" ry="80" fill="rgba(80,60,50,0.5)" clip-path="url(#rightpage)"/>
+  <ellipse cx="620" cy="260" rx="50" ry="70" fill="rgba(60,50,40,0.4)" clip-path="url(#rightpage)"/>
+  <rect x="441" y="310" width="240" height="70" fill="rgba(60,45,35,0.6)" clip-path="url(#rightpage)"/>
+  <rect x="441" y="80" width="240" height="300" fill="url(#highlight)" clip-path="url(#rightpage)"/>
+  <!-- Page number -->
+  <text x="666" y="368" font-size="7" fill="rgba(156,163,175,0.5)" text-anchor="end" font-family="monospace">1</text>
+
+  <!-- Spine -->
+  <rect x="440" y="80" width="2" height="300" fill="rgba(0,0,0,0.4)"/>
+
+  <!-- Gutter shadows -->
+  <rect x="441" y="80" width="30" height="300" fill="url(#lgut)" clip-path="url(#rightpage)"/>
+  <defs>
+    <linearGradient id="lgut" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.12)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Nav arrows -->
+  <circle cx="174" cy="230" r="14" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="174" y="234" font-size="11" fill="rgba(100,100,100,0.6)" text-anchor="middle">←</text>
+  <circle cx="707" cy="230" r="14" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="707" y="234" font-size="11" fill="rgba(249,115,22,0.5)" text-anchor="middle">→</text>
+
+  <!-- Scrubber -->
+  <text x="295" y="415" font-size="8" fill="rgba(255,255,255,0.18)" font-family="monospace">Cover</text>
+  <text x="430" y="415" font-size="8" fill="rgba(255,255,255,0.18)" text-anchor="middle" font-family="monospace">Spread 1 / 11</text>
+  <text x="567" y="415" font-size="8" fill="rgba(255,255,255,0.18)" text-anchor="end" font-family="monospace">p.1</text>
+  <rect x="295" y="422" width="272" height="2" rx="1" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="295" cy="423" r="5" fill="#ea580c"/>
+
+  <!-- ── RIGHT: Book Panel ── -->
+  <rect x="720" y="37" width="240" height="523" fill="rgba(10,9,8,0.98)"/>
+  <rect x="720" y="37" width="1" height="523" fill="rgba(255,255,255,0.05)"/>
+
+  <!-- Book Size -->
+  <text x="734" y="64" font-size="7" fill="rgba(255,255,255,0.25)" letter-spacing="3" font-family="monospace">BOOK SIZE</text>
+  <rect x="732" y="70" width="214" height="24" rx="2" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+  <text x="742" y="86" font-size="9" fill="rgba(200,200,200,0.8)">10 × 10 in  (Square)</text>
+  <text x="928" y="86" font-size="9" fill="rgba(255,255,255,0.25)" text-anchor="end">▾</text>
+  <text x="734" y="108" font-size="7" fill="rgba(255,255,255,0.14)" font-family="monospace">10 × 10 in</text>
+
+  <!-- Pages -->
+  <rect x="720" y="115" width="240" height="1" fill="rgba(255,255,255,0.05)"/>
+  <text x="734" y="134" font-size="7" fill="rgba(255,255,255,0.25)" letter-spacing="2" font-family="monospace">PAGES</text>
+  <text x="932" y="134" font-size="10" fill="#f97316" text-anchor="end" font-family="monospace">20</text>
+
+  <!-- Mode toggle -->
+  <rect x="720" y="140" width="240" height="1" fill="rgba(255,255,255,0.04)"/>
+  <rect x="730" y="148" width="108" height="22" rx="2" fill="rgba(249,115,22,0.15)" stroke="rgba(249,115,22,0.3)" stroke-width="0.5"/>
+  <text x="784" y="162" font-size="7" fill="rgba(249,115,22,0.9)" text-anchor="middle" letter-spacing="1">SINGLE PAGE</text>
+  <rect x="842" y="148" width="108" height="22" rx="2" fill="transparent" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <text x="896" y="162" font-size="7" fill="rgba(255,255,255,0.2)" text-anchor="middle" letter-spacing="1">FULL SPREAD</text>
+
+  <!-- Left/Right toggle -->
+  <rect x="720" y="174" width="240" height="1" fill="rgba(255,255,255,0.04)"/>
+  <rect x="730" y="182" width="108" height="20" rx="2" fill="transparent" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <text x="784" y="195" font-size="7" fill="rgba(255,255,255,0.2)" text-anchor="middle">p.1 — LEFT</text>
+  <rect x="842" y="182" width="108" height="20" rx="2" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.3)" stroke-width="0.5"/>
+  <text x="896" y="195" font-size="7" fill="rgba(249,115,22,0.85)" text-anchor="middle">p.1 — RIGHT</text>
+
+  <!-- Layout label -->
+  <text x="734" y="218" font-size="7" fill="rgba(255,255,255,0.2)" letter-spacing="3" font-family="monospace">LAYOUT</text>
+
+  <!-- Layout thumbnails grid (3 col) -->
+  <!-- Row 1 -->
+  <!-- Full Bleed (active) -->
+  <rect x="730" y="226" width="60" height="62" rx="2" fill="rgba(249,115,22,0.08)" stroke="rgba(249,115,22,0.4)" stroke-width="0.8"/>
+  <rect x="733" y="229" width="54" height="54" rx="1" fill="rgba(249,115,22,0.28)"/>
+  <text x="760" y="297" font-size="6" fill="rgba(249,115,22,0.8)" text-anchor="middle">FULL BLEED</text>
+
+  <!-- Two Col -->
+  <rect x="796" y="226" width="60" height="62" rx="2" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <rect x="799" y="229" width="25" height="54" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="826" y="229" width="26" height="54" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <text x="826" y="297" font-size="6" fill="rgba(255,255,255,0.2)" text-anchor="middle">TWO COL</text>
+
+  <!-- Photo + Caption -->
+  <rect x="862" y="226" width="60" height="62" rx="2" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <rect x="865" y="229" width="54" height="42" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="865" y="273" width="54" height="13" rx="0.5" fill="rgba(99,140,255,0.14)"/>
+  <text x="892" y="297" font-size="6" fill="rgba(255,255,255,0.2)" text-anchor="middle">PHOTO+CAP</text>
+
+  <!-- Row 2 -->
+  <rect x="730" y="302" width="60" height="62" rx="2" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <rect x="733" y="305" width="54" height="25" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="733" y="332" width="25" height="27" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="760" y="332" width="27" height="27" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <text x="760" y="373" font-size="6" fill="rgba(255,255,255,0.2)" text-anchor="middle">TRIPTYCH</text>
+
+  <rect x="796" y="302" width="60" height="62" rx="2" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <rect x="799" y="305" width="26" height="25" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="827" y="305" width="25" height="25" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="799" y="332" width="26" height="26" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="827" y="332" width="25" height="26" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+  <text x="826" y="373" font-size="6" fill="rgba(255,255,255,0.2)" text-anchor="middle">QUAD</text>
+
+  <!-- Custom (+) -->
+  <rect x="862" y="302" width="60" height="62" rx="2" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  <text x="892" y="337" font-size="18" fill="rgba(255,255,255,0.12)" text-anchor="middle">+</text>
+  <text x="892" y="373" font-size="6" fill="rgba(255,255,255,0.2)" text-anchor="middle">CUSTOM</text>
+
+  <!-- Export buttons -->
+  <rect x="720" y="446" width="240" height="1" fill="rgba(255,255,255,0.05)"/>
+  <rect x="730" y="456" width="214" height="28" rx="2" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.35)" stroke-width="0.8"/>
+  <text x="837" y="474" font-size="8" fill="rgba(255,220,200,0.9)" text-anchor="middle" letter-spacing="2" font-weight="bold" font-family="monospace">EXPORT PDF</text>
+  <rect x="730" y="490" width="214" height="20" rx="2" fill="transparent"/>
+  <text x="837" y="503" font-size="7" fill="rgba(255,255,255,0.18)" text-anchor="middle" letter-spacing="2" font-family="monospace">EXPORT JSON (INDESIGN)</text>
+  <text x="837" y="524" font-size="7" fill="rgba(255,255,255,0.1)" text-anchor="middle" letter-spacing="2" font-family="monospace">RESET</text>
+
+  <!-- ── BOTTOM: Library ── -->
+  <rect x="161" y="430" width="558" height="1" fill="rgba(255,255,255,0.04)"/>
+  <rect x="161" y="431" width="558" height="129" fill="rgba(0,0,0,0.5)"/>
+
+  <!-- Library header -->
+  <text x="173" y="449" font-size="8" fill="rgba(255,255,255,0.2)" letter-spacing="3" font-family="monospace">LIBRARY</text>
+  <text x="240" y="449" font-size="7" fill="rgba(255,255,255,0.1)" font-family="monospace">34 images · 2 folders</text>
+  <rect x="640" y="437" width="70" height="18" rx="1" fill="transparent" stroke="rgba(255,255,255,0.07)" stroke-width="0.5"/>
+  <text x="675" y="449" font-size="7" fill="rgba(255,255,255,0.25)" text-anchor="middle" font-family="monospace">+ Add Folder</text>
+
+  <!-- Folder row 1 -->
+  <rect x="161" y="455" width="558" height="1" fill="rgba(255,255,255,0.03)"/>
+  <rect x="161" y="456" width="70" height="52" fill="rgba(0,0,0,0.2)"/>
+  <rect x="231" y="456" width="1" height="52" fill="rgba(255,255,255,0.03)"/>
+  <text x="168" y="469" font-size="7" fill="rgba(255,255,255,0.3)" font-weight="bold">Iceland</text>
+  <text x="168" y="499" font-size="7" fill="rgba(255,255,255,0.15)" font-family="monospace">18</text>
+
+  <!-- Thumbnails row 1 -->
+  <g>
+    <rect x="236" y="460" width="48" height="44" rx="1" fill="#7ba7c4"/>
+    <rect x="236" y="460" width="48" height="44" rx="1" fill="url(#sky)" opacity="0.8"/>
+    <rect x="290" y="460" width="48" height="44" rx="1" fill="#8a7060"/>
+    <rect x="344" y="460" width="48" height="44" rx="1" fill="#6b8a70"/>
+    <rect x="398" y="460" width="48" height="44" rx="1" fill="#a08060"/>
+    <rect x="452" y="460" width="48" height="44" rx="1" fill="#607080"/>
+    <rect x="506" y="460" width="48" height="44" rx="1" fill="#7a6858"/>
+    <rect x="560" y="460" width="48" height="44" rx="1" fill="#8090a0"/>
+    <rect x="614" y="460" width="48" height="44" rx="1" fill="#706050"/>
+    <!-- Subtle border on each thumb -->
+    <rect x="236" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="290" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="344" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="398" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="452" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="506" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="560" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="614" y="460" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  </g>
+
+  <!-- Folder row 2 -->
+  <rect x="161" y="508" width="558" height="1" fill="rgba(255,255,255,0.03)"/>
+  <rect x="161" y="509" width="70" height="52" fill="rgba(0,0,0,0.2)"/>
+  <rect x="231" y="509" width="1" height="52" fill="rgba(255,255,255,0.03)"/>
+  <text x="168" y="522" font-size="7" fill="rgba(255,255,255,0.3)" font-weight="bold">New York</text>
+  <text x="168" y="552" font-size="7" fill="rgba(255,255,255,0.15)" font-family="monospace">16</text>
+
+  <!-- Thumbnails row 2 -->
+  <g>
+    <rect x="236" y="513" width="48" height="44" rx="1" fill="#606880"/>
+    <rect x="290" y="513" width="48" height="44" rx="1" fill="#808070"/>
+    <rect x="344" y="513" width="48" height="44" rx="1" fill="#705860"/>
+    <rect x="398" y="513" width="48" height="44" rx="1" fill="#506870"/>
+    <rect x="452" y="513" width="48" height="44" rx="1" fill="#786858"/>
+    <rect x="506" y="513" width="48" height="44" rx="1" fill="#686080"/>
+    <rect x="560" y="513" width="48" height="44" rx="1" fill="#707860"/>
+    <rect x="614" y="513" width="48" height="44" rx="1" fill="#585878"/>
+    <rect x="236" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="290" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="344" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="398" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="452" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="506" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="560" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+    <rect x="614" y="513" width="48" height="44" rx="1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+  </g>
+</svg>
