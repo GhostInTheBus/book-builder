@@ -1,0 +1,18 @@
+# Synology metadata
+@eaDir/
+#recycle/
+.smbdelete*
+@tmp/
+
+# Node
+node_modules/
+phototable-src/dist/
+
+# Env / secrets
+.env
+*.local
+
+# OS
+.DS_Store
+**/.DS_Store
+Thumbs.db
