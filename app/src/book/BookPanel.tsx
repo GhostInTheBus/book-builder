@@ -89,6 +89,7 @@ function SlotRow({ slot, onUpdate, onDelete }: { slot: BookSlotType; onUpdate: (
 export function BookPanel() {
   const { sizeId, customWidth, customHeight, bookStyle, defaultLayoutId, numPages, currentSpreadIndex, pageLayouts, customSlots, spreadLayouts, customSpreadSlots, assignments } = useStore((s) => s.book)
   const { setBookSizeId, setCustomSize, setBookStyle, setBookNumPages, setPageLayout, setCustomSlots, setSpreadLayout, setCustomSpreadSlots, clearAllAssignments } = useStore()
+  const folders = useStore((s) => s.library.folders)
 
   const [layoutMode, setLayoutMode] = useState<'page' | 'spread'>('page')
   const [target, setTarget] = useState<'left' | 'right'>('right')
@@ -145,6 +146,7 @@ export function BookPanel() {
       await exportBookToPDF(
         size, numPages, assignments, pageLayouts, customSlots,
         spreadLayouts, customSpreadSlots, defaultLayoutId,
+        folders,
         `book-${sizeId}-${date}.pdf`,
         (p) => setPdfProgress(p)
       )
@@ -429,7 +431,9 @@ export function BookPanel() {
           className="w-full py-2.5 text-[9px] font-bold uppercase tracking-[0.2em] rounded-sm border border-orange-500/35 bg-orange-500/12 text-orange-200 hover:bg-orange-500/22 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {pdfProgress
-            ? `Rendering ${pdfProgress.current} / ${pdfProgress.total}…`
+            ? pdfProgress.current === 0
+              ? 'Loading images…'
+              : `Rendering ${pdfProgress.current} / ${pdfProgress.total}…`
             : 'Export PDF'}
         </button>
         <button

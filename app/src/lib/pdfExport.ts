@@ -1,6 +1,37 @@
 import jsPDF from 'jspdf'
-import { BookAssignment, BookSize, BookSlot, PageLayout } from '../store/types'
+import { BookAssignment, BookSize, BookSlot, Folder, PageLayout } from '../store/types'
 import { getLayout, SPREAD_PAGE_OFFSET } from '../templates'
+import { createFullResUrl } from './imageLoader'
+
+// ─── Full-res image map ──────────────────────────────────────────────────────
+// Builds libraryImageId → full-resolution blob URL from file handles.
+// Returns a cleanup function that revokes all created blob URLs.
+
+async function buildFullResMap(
+  folders: Folder[],
+  usedIds: Set<string>
+): Promise<{ map: Map<string, string>; cleanup: () => void }> {
+  const map = new Map<string, string>()
+  const allImages = folders.flatMap(f => f.images)
+
+  await Promise.all(
+    allImages
+      .filter(img => usedIds.has(img.id) && img.fileHandle)
+      .map(async img => {
+        try {
+          const url = await createFullResUrl(img.fileHandle!)
+          map.set(img.id, url)
+        } catch {
+          // fall back to thumbnailUrl — handled at draw time
+        }
+      })
+  )
+
+  return {
+    map,
+    cleanup: () => map.forEach(url => URL.revokeObjectURL(url)),
+  }
+}
 
 // ─── Image drawing (replicates CSS object-fit:cover + object-position + transform:scale) ──
 
@@ -8,7 +39,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => resolve(img)
-    img.onerror = () => reject(new Error(`Failed to load: ${src}`))
+    img.onerror = () => reject(new Error(`Failed to load image`))
     img.src = src
   })
 }
@@ -26,7 +57,7 @@ async function drawImageSlot(
     return
   }
 
-  // 1. object-fit: cover  →  scale so image fills the slot
+  // 1. object-fit: cover → scale so image fills the slot
   const coverScale = Math.max(slotW / img.naturalWidth, slotH / img.naturalHeight)
   const scaledW = img.naturalWidth * coverScale
   const scaledH = img.naturalHeight * coverScale
@@ -111,6 +142,7 @@ async function renderPageToCanvas(
   layout: PageLayout,
   pageIndex: number,
   assignments: Record<string, BookAssignment>,
+  fullResMap: Map<string, string>,
   pixelWidth: number,
   pixelHeight: number,
   isSpread: boolean,
@@ -121,12 +153,9 @@ async function renderPageToCanvas(
   canvas.height = pixelHeight
   const ctx = canvas.getContext('2d')!
 
-  // Paper background
   ctx.fillStyle = '#fdfbf9'
   ctx.fillRect(0, 0, pixelWidth, pixelHeight)
 
-  // In spread mode slots span the full two-page width; each half of the spread
-  // is rendered by offsetting the right page by -pixelWidth
   const spreadWidth = isSpread ? pixelWidth * 2 : pixelWidth
 
   for (const slotDef of layout.slots) {
@@ -138,27 +167,20 @@ async function renderPageToCanvas(
     const key = `${pageIndex}-${slotDef.id}`
     const assignment = assignments[key] ?? null
 
-    if (assignment?.type === 'image' && assignment.thumbnailUrl) {
-      await drawImageSlot(ctx, assignment.thumbnailUrl,
-        slotX, slotY, slotW, slotH,
-        assignment.cropX ?? 0.5, assignment.cropY ?? 0.5, assignment.cropZoom ?? 1)
+    if (assignment?.type === 'image') {
+      // Prefer full-res URL; fall back to thumbnail
+      const src = (assignment.libraryImageId && fullResMap.get(assignment.libraryImageId))
+        ?? assignment.thumbnailUrl
+      if (src) {
+        await drawImageSlot(ctx, src,
+          slotX, slotY, slotW, slotH,
+          assignment.cropX ?? 0.5, assignment.cropY ?? 0.5, assignment.cropZoom ?? 1)
+      }
     } else if (assignment?.type === 'text' && assignment.textContent) {
       drawTextSlot(ctx, assignment.textContent, slotX, slotY, slotW, slotH)
     } else {
       drawEmptySlot(ctx, slotDef.type, slotX, slotY, slotW, slotH)
     }
-  }
-
-  // Page number (not on spread pages — matches BookPage.tsx behaviour)
-  if (!isSpread && layout.slots.length > 0) {
-    ctx.save()
-    ctx.fillStyle = 'rgba(156,163,175,0.5)'
-    ctx.font = `${Math.max(7, pixelWidth * 0.016)}px monospace`
-    const numStr = String(pageIndex + 1)
-    const numW = ctx.measureText(numStr).width
-    const margin = pixelWidth * 0.018
-    ctx.fillText(numStr, isRightPage ? pixelWidth - margin - numW : margin, pixelHeight - margin)
-    ctx.restore()
   }
 
   return canvas
@@ -193,6 +215,14 @@ function resolveSpreadLayout(
   return getLayout(layoutId)
 }
 
+function collectUsedImageIds(assignments: Record<string, BookAssignment>): Set<string> {
+  const ids = new Set<string>()
+  for (const a of Object.values(assignments)) {
+    if (a.type === 'image' && a.libraryImageId) ids.add(a.libraryImageId)
+  }
+  return ids
+}
+
 // ─── Public API ─────────────────────────────────────────────────────────────
 
 export interface PDFProgress {
@@ -210,15 +240,21 @@ export async function exportBookToPDF(
   spreadLayouts: Record<number, string>,
   customSpreadSlots: Record<number, BookSlot[]>,
   defaultLayoutId: string,
+  folders: Folder[],
   filename: string,
   onProgress?: (p: PDFProgress) => void
 ): Promise<void> {
-  // Render at 150 DPI equivalent for the given page size
-  const DPI = 150
+  // 300 DPI — standard print resolution
+  const DPI = 300
   const pixelWidth  = Math.round(size.width  * DPI)
   const pixelHeight = Math.round(size.height * DPI)
 
-  // Identify which pages are covered by a spread layout
+  // Load full-res source images for every photo used in the book
+  onProgress?.({ current: 0, total: numPages, label: 'Loading images…' })
+  const usedIds = collectUsedImageIds(assignments)
+  const { map: fullResMap, cleanup } = await buildFullResMap(folders, usedIds)
+
+  // Identify spread-covered pages
   const maxSpreads = Math.ceil((numPages + 1) / 2)
   const spreadCoveredPages = new Set<number>()
   for (let si = 0; si < maxSpreads; si++) {
@@ -229,28 +265,25 @@ export async function exportBookToPDF(
     if (ri >= 0 && ri < numPages) spreadCoveredPages.add(ri)
   }
 
-  // Build an ordered list of render jobs (one per PDF page)
   interface Job {
-    pageIndex: number   // physical page index (0-based) — used for PDF ordering
+    pageIndex: number
     label: string
     render: () => Promise<HTMLCanvasElement>
   }
 
   const jobs: Job[] = []
 
-  // Individual pages (not covered by a spread)
   for (let i = 0; i < numPages; i++) {
     if (spreadCoveredPages.has(i)) continue
     const layout = resolvePageLayout(i, defaultLayoutId, pageLayouts, customSlots)
-    const isLeft = i % 2 === 1 // odd page indices are left pages
+    const isLeft = i % 2 === 1
     jobs.push({
       pageIndex: i,
       label: `Page ${i + 1}`,
-      render: () => renderPageToCanvas(layout, i, assignments, pixelWidth, pixelHeight, false, !isLeft),
+      render: () => renderPageToCanvas(layout, i, assignments, fullResMap, pixelWidth, pixelHeight, false, !isLeft),
     })
   }
 
-  // Spread pages
   for (let si = 0; si < maxSpreads; si++) {
     const spreadLayout = resolveSpreadLayout(si, spreadLayouts, customSpreadSlots)
     if (!spreadLayout) continue
@@ -262,30 +295,32 @@ export async function exportBookToPDF(
       jobs.push({
         pageIndex: li,
         label: `Page ${li + 1} (spread)`,
-        render: () => renderPageToCanvas(spreadLayout, vpi, assignments, pixelWidth, pixelHeight, true, false),
+        render: () => renderPageToCanvas(spreadLayout, vpi, assignments, fullResMap, pixelWidth, pixelHeight, true, false),
       })
     }
     if (ri >= 0 && ri < numPages) {
       jobs.push({
         pageIndex: ri,
         label: `Page ${ri + 1} (spread)`,
-        render: () => renderPageToCanvas(spreadLayout, vpi, assignments, pixelWidth, pixelHeight, true, true),
+        render: () => renderPageToCanvas(spreadLayout, vpi, assignments, fullResMap, pixelWidth, pixelHeight, true, true),
       })
     }
   }
 
-  // Sort by physical page index
   jobs.sort((a, b) => a.pageIndex - b.pageIndex)
 
-  // Create the PDF document
   const pdf = new jsPDF({ unit: 'in', format: [size.width, size.height] })
 
-  for (let j = 0; j < jobs.length; j++) {
-    onProgress?.({ current: j + 1, total: jobs.length, label: jobs[j].label })
-    const canvas = await jobs[j].render()
-    const imgData = canvas.toDataURL('image/jpeg', 0.92)
-    if (j > 0) pdf.addPage([size.width, size.height])
-    pdf.addImage(imgData, 'JPEG', 0, 0, size.width, size.height)
+  try {
+    for (let j = 0; j < jobs.length; j++) {
+      onProgress?.({ current: j + 1, total: jobs.length, label: jobs[j].label })
+      const canvas = await jobs[j].render()
+      const imgData = canvas.toDataURL('image/jpeg', 0.95)
+      if (j > 0) pdf.addPage([size.width, size.height])
+      pdf.addImage(imgData, 'JPEG', 0, 0, size.width, size.height)
+    }
+  } finally {
+    cleanup()
   }
 
   pdf.save(filename)
