@@ -96,28 +96,29 @@ export function BookSlot({
   }
 
   // ─── Photo adjustment (drag to pan, scroll to zoom) ─────────────────────
-  function enterAdjustMode(e: React.MouseEvent) {
-    if (slotDef.type !== 'image' || !assignment || assignment.type !== 'image') return
-    e.stopPropagation()
-    setAdjusting(true)
-  }
-
-  function exitAdjustMode() {
-    if (!adjusting) return
-    adjustImageCrop(pageIndex, slotDef.id, localCropX, localCropY, localZoom)
-    setAdjusting(false)
+  function commitCrop(cropX: number, cropY: number, zoom: number) {
+    adjustImageCrop(pageIndex, slotDef.id, cropX, cropY, zoom)
   }
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (!adjusting || slotDef.type !== 'image') return
+    if (slotDef.type !== 'image' || !assignment || assignment.type !== 'image') return
+    // Don't interfere with button clicks inside the slot
+    if ((e.target as HTMLElement).closest('button')) return
     e.preventDefault()
+    e.stopPropagation()
+    const cropX = assignment.cropX ?? 0.5
+    const cropY = assignment.cropY ?? 0.5
+    setLocalCropX(cropX)
+    setLocalCropY(cropY)
+    setLocalZoom(assignment.cropZoom ?? 1)
+    setAdjusting(true)
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
-      startCropX: localCropX,
-      startCropY: localCropY,
+      startCropX: cropX,
+      startCropY: cropY,
     }
-  }, [adjusting, localCropX, localCropY])
+  }, [assignment, slotDef.type])
 
   useEffect(() => {
     if (!adjusting) return
@@ -128,16 +129,27 @@ export function BookSlot({
       const dx = (e.clientX - dragRef.current.startX) / rect.width
       const dy = (e.clientY - dragRef.current.startY) / rect.height
       // Dragging right → panning image left → decrease X (shows more right side)
-      setLocalCropX(Math.max(0, Math.min(1, dragRef.current.startCropX - dx)))
-      setLocalCropY(Math.max(0, Math.min(1, dragRef.current.startCropY - dy)))
+      const newCropX = Math.max(0, Math.min(1, dragRef.current.startCropX - dx))
+      const newCropY = Math.max(0, Math.min(1, dragRef.current.startCropY - dy))
+      setLocalCropX(newCropX)
+      setLocalCropY(newCropY)
     }
 
     function handleMouseUp() {
+      if (dragRef.current !== null) {
+        // Commit on mouse-up — no "Done" click needed
+        commitCrop(localCropX, localCropY, localZoom)
+      }
       dragRef.current = null
+      setAdjusting(false)
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') exitAdjustMode()
+      if (e.key === 'Escape') {
+        // Revert to stored values on Escape
+        dragRef.current = null
+        setAdjusting(false)
+      }
     }
 
     window.addEventListener('mousemove', handleMouseMove)
@@ -173,9 +185,11 @@ export function BookSlot({
       className={`
         overflow-hidden select-none group transition-all duration-100
         ${adjusting
-          ? 'ring-2 ring-blue-400/70 cursor-move'
+          ? 'ring-2 ring-blue-400/70 cursor-grabbing'
           : dragOver
             ? 'ring-2 ring-orange-400 bg-orange-500/20'
+            : assignment?.type === 'image'
+              ? 'ring-1 ring-white/10 cursor-grab'
             : assignment
               ? 'ring-1 ring-white/10'
               : slotDef.type === 'image'
@@ -203,41 +217,31 @@ export function BookSlot({
                 }}
               />
 
-              {/* Adjust button (shown on hover when not adjusting) */}
+              {/* Hover overlay: clear button + pan hint */}
               {!adjusting && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <div className="flex gap-1.5">
-                    <button
-                      className="pointer-events-auto px-2 py-1 bg-black/70 text-white text-[7px] uppercase tracking-wider rounded-sm hover:bg-blue-900/80 transition-colors"
-                      onClick={enterAdjustMode}
-                    >
-                      Adjust
-                    </button>
-                    <button
-                      className="pointer-events-auto w-6 h-6 bg-black/70 text-white rounded-sm flex items-center justify-center text-[10px] hover:bg-red-900/80 transition-colors"
-                      onClick={handleClear}
-                    >
-                      ×
-                    </button>
-                  </div>
+                <div className="absolute inset-0 flex items-start justify-end opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none p-1">
+                  <button
+                    className="pointer-events-auto w-6 h-6 bg-black/70 text-white rounded-sm flex items-center justify-center text-[10px] hover:bg-red-900/80 transition-colors"
+                    onClick={handleClear}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              {!adjusting && (
+                <div className="absolute bottom-0 inset-x-0 flex items-center justify-center py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <span className="text-[6px] text-white/60 uppercase tracking-widest bg-black/50 px-1.5 py-0.5 rounded-sm">
+                    drag to pan · scroll to zoom
+                  </span>
                 </div>
               )}
 
-              {/* Adjust mode overlay */}
+              {/* Adjusting overlay: show zoom level */}
               {adjusting && (
-                <div className="absolute inset-0 flex flex-col">
-                  <div className="flex-1" />
-                  <div className="flex items-center justify-between px-2 py-1.5 bg-black/75">
-                    <span className="text-[7px] text-blue-300 uppercase tracking-widest">
-                      Drag to pan · Scroll to zoom · {Math.round(effectiveZoom * 100)}%
-                    </span>
-                    <button
-                      onClick={exitAdjustMode}
-                      className="text-[7px] text-white/60 hover:text-white uppercase tracking-wider px-1.5 py-0.5 border border-white/20 rounded-sm hover:border-white/50 transition-colors"
-                    >
-                      Done
-                    </button>
-                  </div>
+                <div className="absolute bottom-0 inset-x-0 flex items-center justify-center py-1 pointer-events-none">
+                  <span className="text-[6px] text-blue-300 uppercase tracking-widest bg-black/60 px-1.5 py-0.5 rounded-sm">
+                    {Math.round(effectiveZoom * 100)}%
+                  </span>
                 </div>
               )}
             </>
