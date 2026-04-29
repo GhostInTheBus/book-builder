@@ -242,10 +242,10 @@ export async function exportBookToPDF(
   defaultLayoutId: string,
   folders: Folder[],
   filename: string,
+  dpi: 72 | 150 | 300 = 300,
   onProgress?: (p: PDFProgress) => void
 ): Promise<void> {
-  // 300 DPI — standard print resolution
-  const DPI = 300
+  const DPI = dpi
   const pixelWidth  = Math.round(size.width  * DPI)
   const pixelHeight = Math.round(size.height * DPI)
 

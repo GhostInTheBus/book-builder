@@ -94,6 +94,7 @@ export function BookPanel() {
   const [layoutMode, setLayoutMode] = useState<'page' | 'spread'>('page')
   const [target, setTarget] = useState<'left' | 'right'>('right')
   const [pdfProgress, setPdfProgress] = useState<PDFProgress | null>(null)
+  const [pdfDpi, setPdfDpi] = useState<72 | 150 | 300>(300)
 
   const size = sizeId === 'custom'
     ? { id: 'custom', name: 'Custom', width: customWidth || 10, height: customHeight || 10, unit: 'in' as const, category: 'square' as const }
@@ -147,8 +148,9 @@ export function BookPanel() {
         size, numPages, assignments, pageLayouts, customSlots,
         spreadLayouts, customSpreadSlots, defaultLayoutId,
         folders,
-        `book-${sizeId}-${date}.pdf`,
-        (p) => setPdfProgress(p)
+        `book-${sizeId}-${pdfDpi}dpi-${date}.pdf`,
+        pdfDpi,
+        (p) => setPdfProgress(p),
       )
     } finally {
       setPdfProgress(null)
@@ -425,6 +427,23 @@ export function BookPanel() {
 
       {/* Export */}
       <div className="px-4 py-4 border-t border-white/[0.05] space-y-2 bg-black/30">
+        {/* DPI selector */}
+        <div className="flex gap-1">
+          {([72, 150, 300] as const).map((dpi) => (
+            <button
+              key={dpi}
+              onClick={() => setPdfDpi(dpi)}
+              disabled={!!pdfProgress}
+              className={`flex-1 py-1.5 text-[8px] font-mono rounded-sm border transition-all ${
+                pdfDpi === dpi
+                  ? 'bg-white/8 text-white/60 border-white/20'
+                  : 'text-white/20 border-white/5 hover:text-white/35 hover:border-white/12'
+              } disabled:opacity-30`}
+            >
+              {dpi}
+            </button>
+          ))}
+        </div>
         <button
           onClick={handlePDFExport}
           disabled={!!pdfProgress}
