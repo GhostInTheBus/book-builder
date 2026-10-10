@@ -2,6 +2,10 @@
 
 A browser-based tool for laying out photobooks and zines. Drag your photos onto pages, pick a layout, and export a print-ready PDF — all without leaving the browser.
 
+https://github.com/user-attachments/assets/70fba48a-14d5-473f-b0b1-aa8993ce7813
+
+[Watch on YouTube](https://youtu.be/Y2VtCEr-ezQ) (1:28)
+
 ![Book Builder interface showing two pages with photo layouts, a contact-sheet library at the bottom, and layout controls on the right](screenshot.svg)
 
 ---
